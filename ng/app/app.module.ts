@@ -10,6 +10,9 @@ import { HttpModule, JsonpModule }    from '@angular/http';
 import { AppComponent }         from './app.component';
 import { routing }              from './app.routing';
 import {MapComponent} from "./maps/map.component";
+import { DonorComponent } from "./donors/donor.component";
+import {DonorService} from "./donors/donor.service";
+import {PatientComponent} from "./patients/patient.component";
 
 @NgModule({
     imports: [
@@ -22,8 +25,10 @@ import {MapComponent} from "./maps/map.component";
     declarations: [
         AppComponent,
         MapComponent,
+        DonorComponent,
+        PatientComponent
     ],
-    providers: [ ],
+    providers: [ DonorService ],
     bootstrap: [ AppComponent ]
 })
 export class AppModule { }

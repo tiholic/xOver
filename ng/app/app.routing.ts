@@ -4,12 +4,26 @@
 
 import {Routes, RouterModule} from "@angular/router";
 import {ModuleWithProviders} from "@angular/core";
-import {MapComponent} from "./maps/map.component"
+import {DonorComponent} from "./donors/donor.component";
+import {PatientComponent} from "./patients/patient.component";
 
 const appRoutes : Routes = [
     {
+        path: 'donors',
+        component: DonorComponent
+    },
+    {
+        path: 'donors/:id',
+        component: DonorComponent
+    },
+    {
+        path: 'patients',
+        component: PatientComponent
+    },
+    {
         path: '',
-        component: MapComponent
+        redirectTo: '/donors',
+        pathMatch: 'full'
     }
 ];
 

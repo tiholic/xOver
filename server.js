@@ -8,14 +8,14 @@ var bodyParser = require('body-parser');            //parses information from PO
 var express = require('express');
 var http = require('http');
 var socket = require('socket.io');
-var socketUsers = require('socket.io.users');
+var sock = require('./src/sockets/ti.socket.io');
 var api_routes = require('./src/api_routes');
 var view_routes = require('./src/view_routes');
 /*  Imports complete    */
 
 mongoose.connect("mongodb://localhost/mean-ti");
 var db = mongoose.connection;
-var server, app;
+var server, app, io = undefined;
 console.log("Trying to connect to database");
 db.on("error", function(){console.log("**************cannot connect to database****************")});
 db.on("open", function(){
@@ -82,11 +82,8 @@ db.on("open", function(){
     server.listen(port);
     server.on('error', onError);
     server.on('listening', onListening);
+    io = socket(server, {});
 });
-
-/**
- * Normalize a port into a number, string, or false.
- */
 
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -120,28 +117,11 @@ function onError(error) {
 }
 
 function onListening() {
-    startWebSocket();
+    sock.listen(io);
     var address = server.address();
     var bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + address.port;
     console.log('App running at ' + bind);
     debug('Listening on ' + bind);
 }
 
-function startWebSocket(){
-    var io = socket(server, {});
-
-    socketUsers.Session(app);
-    var users = socketUsers.Users;
-    io.use(socketUsers.Middleware());
-
-    users.on('connected',function(user){
-        console.log('User has connected with ID: '+ user.id);
-    });
-    users.on('connection',function(user){
-        console.log('Socket ID: '+user.socket.id+' is user with ID: '+user.id);
-    });
-    users.on('disconnected',function(user){
-        console.log('User with ID: '+user.id+'is gone away :(');
-    });
-    require('./src/sockets/ti.socket.io')(io);
-}
+module.exports = io;

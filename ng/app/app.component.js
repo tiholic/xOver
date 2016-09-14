@@ -12,10 +12,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var io = require("socket.io-client");
 var AppComponent = (function () {
     function AppComponent() {
         this.title = 'Blood Donation Management';
+        this.data = { name: { first: "ASdf", last: "Asdf" } };
     }
+    AppComponent.prototype.ngOnInit = function () {
+        this.socket = io();
+        this.listenSocketEvents();
+    };
+    AppComponent.prototype.listenSocketEvents = function () {
+        var _this = this;
+        this.socket.on("donors-add", function (msg) { return _this.data.name = msg.name; });
+        this.socket.on("donors-update", function (msg) { return _this.data.name = msg.name; });
+        this.socket.on("donors-delete", function (msg) { console.log(msg); _this.data.name = msg.name; });
+    };
     AppComponent = __decorate([
         core_1.Component({
             selector: 'my-app',

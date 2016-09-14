@@ -10,5 +10,8 @@ function getIndex(req, res){
 }
 
 router.get("/", getIndex);
+router.get("/donors", getIndex);
+router.get("/donors/:id", getIndex);
+router.get("/patients", getIndex);
 
 module.exports = router;

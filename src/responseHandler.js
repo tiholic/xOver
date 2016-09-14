@@ -6,6 +6,7 @@ function send404(res){
     res.send({
         "status": {
             "status_code": 404,
+            "success": false,
             "message": "Not Found"
         }
     });
@@ -15,8 +16,9 @@ function send500(res, err) {
     res.send({
         "status": {
             "status_code": 500,
+            "success": false,
             "message": "Internal Server Error",
-            "detail": err.message
+            "detail": err
         }
     });
 }
@@ -25,6 +27,7 @@ function sendSuccess(res) {
     res.send({
         "status": {
             "status_code": 200,
+            "success": true,
             "message": "Success"
         }
     });
@@ -35,6 +38,7 @@ function sendData(res, data) {
         "data": data,
         "status": {
            "status_code": 200,
+            "success": true,
             "message": "success"
         }
     });

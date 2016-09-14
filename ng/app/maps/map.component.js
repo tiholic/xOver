@@ -12,83 +12,132 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var donor_component_1 = require("../donors/donor.component");
 var MapComponent = (function () {
     function MapComponent() {
+        this.coordsRecieved = new core_1.EventEmitter();
     }
     MapComponent.prototype.ngOnInit = function () {
+        var _this = this;
         requireModules([
             "esri/Map",
-            "esri/widgets/Search",
             "esri/views/MapView",
-            "esri/Graphic",
-            "esri/symbols/Font",
+            "esri/widgets/Search",
             "esri/symbols/TextSymbol",
-            "esri/geometry/Point",
             "esri/geometry/Multipoint",
-            "esri/geometry/SpatialReference",
+            "esri/geometry/Point",
+            "esri/Graphic",
             "esri/PopupTemplate",
-        ], function (Map, Search, MapView, Graphic, Font, TextSymbol, Point, Multipoint, SpatialReference, PopupTemplate) {
-            var map = new Map({
-                basemap: "streets"
-            });
-            var view = new MapView({
-                container: "viewDiv",
-                map: map,
-                zoom: 2,
-                center: [78.1, 20.6]
-            });
-            var searchWidget = new Search({
-                view: view
-            });
-            view.ui.add(searchWidget, {
-                position: 'top-left',
-                index: 0,
-                allPlaceholder: "search for Donors"
-            });
-            var textSymbol = new TextSymbol({
-                color: "red",
-                haloColor: "black",
-                haloSize: "1px",
-                text: "A+",
-                xoffset: 3,
-                yoffset: 3,
-                font: {
-                    size: 12,
-                    family: "sans-serif",
-                    weight: "bolder"
-                }
-            });
-            var point = new Point({
-                longitude: 79,
-                latitude: 20,
-                hasZ: false
-            });
-            var points = new Multipoint({
-                points: [[79, 20], [79, 50]],
-                spatialReference: new SpatialReference({ wkid: 4326 })
-            });
-            var pointAttr = {
-                Name: "Keystone Pipeline",
-                Owner: "TransCanada",
-                Length: "3,456 km" // The length of the pipeline
-            };
-            var polylineGraphic = new Graphic({
-                geometry: points,
-                symbol: textSymbol,
-                attributes: pointAttr,
-                popupTemplate: new PopupTemplate({
-                    title: "{Name}",
-                    content: "{*}" // Displays a table of all the attributes in the popup
-                })
-            });
-            view.graphics.add(polylineGraphic);
+        ], function (Map, MapView, Search, TextSymbol, Multipoint, Point, Graphic, PopupTemplate) {
+            _this.Multipoint = Multipoint;
+            _this.Point = Point;
+            _this.Graphic = Graphic;
+            _this.PopupTemplate = PopupTemplate;
+            _this.createMap(Map, MapView, Search);
+            _this.createSymbol(TextSymbol);
         });
     };
+    MapComponent.prototype.createMap = function (Map, MapView, Search) {
+        var map = new Map({
+            basemap: "streets"
+        });
+        this.view = new MapView({
+            container: "viewDiv",
+            map: map,
+            zoom: 2,
+            center: [78.1, 20.6]
+        });
+        var searchWidget = new Search({
+            view: this.view
+        });
+        this.view.ui.add(searchWidget, {
+            position: 'top-left',
+            index: 0,
+            allPlaceholder: "search for Donors"
+        });
+        this.addRandomClickEvent();
+    };
+    MapComponent.prototype.createSymbol = function (TextSymbol) {
+        this.symbol = new TextSymbol({
+            color: "red",
+            haloColor: "black",
+            haloSize: "1px",
+            text: "A+",
+            xoffset: 3,
+            yoffset: 3,
+            font: {
+                size: 12,
+                family: "sans-serif",
+                weight: "bolder"
+            }
+        });
+    };
+    MapComponent.prototype.getGeometry = function (points) {
+        if (points instanceof Array) {
+            this.geometry = new this.Multipoint({
+                points: [[79, 20], [79, 50]]
+            });
+        }
+        else {
+            this.geometry = new this.Point({
+                x: points.longitude,
+                y: points.latitude,
+                hasZ: false
+            });
+        }
+        this.createGraphic();
+        this.addGraphic();
+    };
+    ;
+    MapComponent.prototype.createGraphic = function () {
+        var pointAttr = {
+            Name: "Keystone Pipeline",
+            Owner: "TransCanada",
+            Length: "3,456 km" // The length of the pipeline
+        };
+        this.graphic = new this.Graphic({
+            geometry: this.geometry,
+            symbol: this.symbol,
+            attributes: pointAttr,
+            popupTemplate: new this.PopupTemplate({
+                title: "{Name}",
+                content: "{*}" // Displays a table of all the attributes in the popup
+            })
+        });
+    };
+    MapComponent.prototype.addGraphic = function () {
+        this.view.graphics.add(this.graphic);
+    };
+    MapComponent.prototype.addRandomClickEvent = function () {
+        var s = this;
+        s.view.on("click", function (evt) {
+            // Get the coordinates of the click on the view
+            // around the decimals to 3 decimals
+            var coords = {
+                latitude: Math.round(evt.mapPoint.latitude * 1000) / 1000,
+                longitude: Math.round(evt.mapPoint.longitude * 1000) / 1000
+            };
+            s.coordsRecieved.emit(coords);
+            s.view.graphics.removeAll();
+            s.getGeometry(coords);
+        });
+    };
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], MapComponent.prototype, "coordsRecieved", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], MapComponent.prototype, "parent", void 0);
     MapComponent = __decorate([
         core_1.Component({
-            selector: 'arcmap',
-            templateUrl: 'ng/app/maps/map.component.html',
-            styleUrls: ['ng/app/maps/map.component.css']
+            selector: 'map-component',
+            template: '<div id="viewDiv" class="arcMap"></div>',
+            styles: [
+                "    \n        .arcMap {\n            padding: 0;\n            margin: 0;\n            height: 650px;\n            width: 1000px;\n            float: left;\n        }\n    "
+            ],
+            directives: [donor_component_1.DonorComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], MapComponent);

@@ -19,6 +19,9 @@ var http_1 = require('@angular/http');
 var app_component_1 = require('./app.component');
 var app_routing_1 = require('./app.routing');
 var map_component_1 = require("./maps/map.component");
+var donor_component_1 = require("./donors/donor.component");
+var donor_service_1 = require("./donors/donor.service");
+var patient_component_1 = require("./patients/patient.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -34,8 +37,10 @@ var AppModule = (function () {
             declarations: [
                 app_component_1.AppComponent,
                 map_component_1.MapComponent,
+                donor_component_1.DonorComponent,
+                patient_component_1.PatientComponent
             ],
-            providers: [],
+            providers: [donor_service_1.DonorService],
             bootstrap: [app_component_1.AppComponent]
         }), 
         __metadata('design:paramtypes', [])

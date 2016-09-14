@@ -4,9 +4,13 @@
 
 var response = require('./responseHandler');
 
-function handler(model) {
+function handler(options) {
     var self = this;
+    var model = options.model;
+    var operation, request;
     self.getList = function(req, res) {
+        operation = "get-list";
+        request = req;
         var query = {};
         for(var column in req.query){
             query[column] = {$regex:req.query[column], $options:'i'};
@@ -16,6 +20,7 @@ function handler(model) {
                 response.send500(res, err);
             }
             if (data) {
+                data = callback(data);
                 response.sendData(res, data);
             } else {
                 response.send404(res);
@@ -24,11 +29,14 @@ function handler(model) {
     };
 
     self.get = function(req, res) {
+        operation = "get";
+        request = req;
         model.findById(req.params.id, function (err, data) {
             if (err) {
                 response.send500(res, err);
             }
             if (data) {
+                data = callback(data);
                 response.sendData(res, data);
             } else {
                 response.send404(res);
@@ -37,7 +45,9 @@ function handler(model) {
     };
 
     self.post = function(req, res) {
-        var newData = model(req.body);
+        operation = "post";
+        request = req;
+        var newData = model(preSave(req.body));
         newData.save(function (err) {
             if (err) {
                 response.send500(res, err);
@@ -46,6 +56,7 @@ function handler(model) {
                     if (err) {
                         response.send404(res);
                     } else {
+                        data = callback(data);
                         response.sendData(res, data);
                     }
                 });
@@ -54,15 +65,18 @@ function handler(model) {
     };
 
     self.put = function(req, res) {
+        operation = 'put';
+        request = req;
         model.findByIdAndUpdate(
             req.params.id,
-            {$set: req.body},
+            {$set: preSave(req.body)},
             {new: true},
             function (err, data) {
                 if (err) {
                     response.send500(res, err)
                 }
                 if (data) {
+                    data = callback(data);
                     response.sendData(res, data);
                 } else {
                     response.send404(res);
@@ -72,14 +86,41 @@ function handler(model) {
     };
 
     self.handleDelete = function(req, res) {
-        model.findByIdAndRemove(req.params.id, function (err) {
+        operation = 'del';
+        request = req;
+        model.findByIdAndRemove(req.params.id, function (err, data) {
             if (err) {
                 response.send500(res, err);
             } else {
+                callback(data);
                 response.sendSuccess(res);
             }
         });
     };
+
+    function callback(data){
+        data = transformData(data);
+        if(options.ccb){
+            options.ccb(operation, data);
+        }
+        return data;
+    }
+
+    function preSave(data){
+        if(options.preSave){
+            return options.preSave(request, data, operation);
+        }else{
+            return data;
+        }
+    }
+
+    function transformData(data){
+        if(options.transformData){
+            return options.transformData(data);
+        }else{
+            return data;
+        }
+    }
 }
 
 module.exports = handler;
