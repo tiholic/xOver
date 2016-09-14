@@ -9,7 +9,8 @@ var express = require('express');
 var http = require('http');
 var socket = require('socket.io');
 var socketUsers = require('socket.io.users');
-var routes = require('./src/tiroutes');
+var api_routes = require('./src/api_routes');
+var view_routes = require('./src/view_routes');
 /*  Imports complete    */
 
 mongoose.connect("mongodb://localhost/mean-ti");
@@ -40,11 +41,9 @@ db.on("open", function(){
     }));
 
     // API routes
-    app.use("/api/", routes);
+    app.use("/api/", api_routes);
     // common route to return index.html
-    app.use("/*", function(req, res){
-        res.sendFile(__dirname+"/index.html");
-    });
+    app.use("/", view_routes);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -144,5 +143,5 @@ function startWebSocket(){
     users.on('disconnected',function(user){
         console.log('User with ID: '+user.id+'is gone away :(');
     });
-    require('./src/chat/ti.socket.io')(io);
+    require('./src/sockets/ti.socket.io')(io);
 }
