@@ -25,7 +25,6 @@ var DonorDetailComponent = (function () {
                 last: ''
             },
             _id: '',
-            private_id: '',
             contact_number: '',
             email: '',
             blood_group: '',
@@ -37,14 +36,17 @@ var DonorDetailComponent = (function () {
         this.errors = [];
     }
     DonorDetailComponent.prototype.ngOnInit = function () {
-    };
-    DonorDetailComponent.prototype.canActivate = function (route, state) {
-        var url = state.url;
-        console.log(url);
-        return true;
-    };
-    DonorDetailComponent.prototype.canActivateChild = function (route, state) {
-        return this.canActivate(route, state);
+        var _this = this;
+        var params = window.location.search.substring(1).split('&');
+        var pmap = {
+            donor_id: null,
+            donor_private: null
+        };
+        for (var i in params) {
+            var kv = params[i].split('=');
+            pmap[kv[0]] = kv[1];
+        }
+        this.donorService.getDonor(pmap.donor_id).subscribe(function (donor) { return _this.donor = donor; }, function (err) { return console.log(err); });
     };
     DonorDetailComponent = __decorate([
         core_1.Component({

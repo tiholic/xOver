@@ -3,15 +3,9 @@
  */
 
 import {Component, OnInit} from "@angular/core";
-import {
-    CanActivate,
-    CanActivateChild,
-    ActivatedRouteSnapshot,
-    RouterStateSnapshot,
-    NavigationExtras, Router
-} from "@angular/router";
+import {Router} from "@angular/router";
 import {DonorService} from "./donor.service";
-import {PrivateDonor} from "../objects";
+import {Donor} from "../objects";
 import {MapComponent} from "../maps/map.component";
 @Component({
     selector: 'donor-detail',
@@ -20,14 +14,13 @@ import {MapComponent} from "../maps/map.component";
     providers: [DonorService],
     directives:[MapComponent]
 })
-export class DonorDetailComponent implements OnInit, CanActivate, CanActivateChild{
-    donor:PrivateDonor = {
+export class DonorDetailComponent implements OnInit{
+    donor:Donor = {
         name:{
             first: '',
             last: ''
         },
         _id: '',
-        private_id: '',
         contact_number: '',
         email: '',
         blood_group: '',
@@ -44,16 +37,18 @@ export class DonorDetailComponent implements OnInit, CanActivate, CanActivateChi
     ){ }
 
     ngOnInit(){
-
-    }
-
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        let url: string = state.url;
-        console.log(url);
-        return true;
-    }
-
-    canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        return this.canActivate(route, state);
+        var params = window.location.search.substring(1).split('&');
+        var pmap = {
+            donor_id: null,
+            donor_private: null
+        };
+        for(var i in params){
+            var kv = params[i].split('=');
+            pmap[kv[0]] = kv[1];
+        }
+        this.donorService.getDonor(pmap.donor_id).subscribe(
+            donor => this.donor = donor,
+            err => console.log(err)
+        )
     }
 }
