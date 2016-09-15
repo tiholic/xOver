@@ -6,6 +6,7 @@ import {Routes, RouterModule} from "@angular/router";
 import {ModuleWithProviders} from "@angular/core";
 import {DonorComponent} from "./donors/donor.component";
 import {PatientComponent} from "./patients/patient.component";
+import {DonorDetailComponent} from "./donors/donor-detail.component";
 
 const appRoutes : Routes = [
     {
@@ -13,8 +14,8 @@ const appRoutes : Routes = [
         component: DonorComponent
     },
     {
-        path: 'donors/:id',
-        component: DonorComponent
+        path: 'donors-detail',
+        component: DonorDetailComponent
     },
     {
         path: 'patients',

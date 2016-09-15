@@ -22,6 +22,7 @@ var map_component_1 = require("./maps/map.component");
 var donor_component_1 = require("./donors/donor.component");
 var donor_service_1 = require("./donors/donor.service");
 var patient_component_1 = require("./patients/patient.component");
+var donor_detail_component_1 = require("./donors/donor-detail.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -38,7 +39,8 @@ var AppModule = (function () {
                 app_component_1.AppComponent,
                 map_component_1.MapComponent,
                 donor_component_1.DonorComponent,
-                patient_component_1.PatientComponent
+                patient_component_1.PatientComponent,
+                donor_detail_component_1.DonorDetailComponent
             ],
             providers: [donor_service_1.DonorService],
             bootstrap: [app_component_1.AppComponent]

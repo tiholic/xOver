@@ -3,6 +3,7 @@
  */
 
 function send404(res){
+    console.log("NA404");
     res.send({
         "status": {
             "status_code": 404,
@@ -13,6 +14,7 @@ function send404(res){
 }
 
 function send500(res, err) {
+    console.log("INTERNAL ERROR", err);
     res.send({
         "status": {
             "status_code": 500,

@@ -23,8 +23,8 @@ var DonorService = (function () {
             'Content-Type': 'application/json'
         });
     }
-    DonorService.prototype.getDonors = function () {
-        return this.http.get(this.donorsUrl)
+    DonorService.prototype.getDonors = function (bounds) {
+        return this.http.get(this.donorsUrl + "?bounds=" + JSON.stringify(bounds))
             .map(this.extractData)
             .catch(this.handleError);
     };
@@ -55,6 +55,7 @@ var DonorService = (function () {
     };
     DonorService.prototype.extractData = function (res) {
         var body = res.json();
+        console.log(body.data);
         return body.data || body.status || {};
     };
     DonorService.prototype.handleError = function (error) {

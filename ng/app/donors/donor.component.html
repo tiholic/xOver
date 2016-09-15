@@ -1,26 +1,27 @@
-<map-component (coordsRecieved)="coordsRecieved($event)" [parent]="donor"></map-component>
-<div *ngIf="success">Successful You can edit or delete your details at <a href="/donors/{{donor._id}}">/donors/{{donor._id}}</a></div>
-<table *ngIf="rawDonor.coordinates.latitude>=-90 && rawDonor.coordinates.latitude <= 90
-            && rawDonor.coordinates.longitude>=-180 && rawDonor.coordinates.latitude <= 180 && !success">
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('name.first')!=-1">First name required</span></td></tr>
-    <tr><td align="right">First Name:</td><td><input type='text' [(ngModel)]="rawDonor.name.first" required/></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('name.last')!=-1">Invalid last name</span></td></tr>
-    <tr><td align="right">Last Name:</td><td><input type='text' [(ngModel)]="rawDonor.name.last" /></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('contact_number')!=-1">Invalid contact number</span></td></tr>
-    <tr><td align="right">Contact Number:</td><td><input type='text' [(ngModel)]="rawDonor.contact_number" required/></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('email')!=-1">Invalid email</span></td></tr>
-    <tr><td align="right">Email:</td><td><input type='text' [(ngModel)]="rawDonor.email" required/></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('blood_group')!=-1">Blood group can be a,b,ab,o/A,B,AB,O +/- (ex: AB+)</span></td></tr>
-    <tr><td align="right">Blood Group:</td><td><input type='text' [(ngModel)]="rawDonor.blood_group" required/></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('coordinates.latitude')!=-1">Select a point on map</span></td></tr>
-    <tr><td colspan="2" align="right"><span class="error"*ngIf="errors.indexOf('coordinates.longitude')!=-1">Select a point on map</span></td></tr>
-    <tr><td align="right"><input type="hidden" [(ngModel)]="rawDonor.coordinates.latitude"/></td>
-        <td><input type="hidden" [(ngModel)]="rawDonor.coordinates.longitude"/></td></tr>
-    <tr>
-        <td colspan="2" align="center">
-            <input type="submit"
-                   (click)="addDonor()"
-            />
-        </td>
-    </tr>
-</table>
+<map-component (coordsReceived)="setCoords($event)" [parent_component]="component_name" #map></map-component>
+<div class="donor-container" *ngIf="rawDonor.coordinates.latitude>=-90 && rawDonor.coordinates.latitude <= 90
+            && rawDonor.coordinates.longitude>=-180 && rawDonor.coordinates.latitude <= 180">
+    <div *ngIf="success">Successful You can edit or delete your details at <a href="donors/{{donor._id}}/{{donor.private_id}}">{{host}}/donors/{{donor._id}}/{{donor.private_id}}</a></div>
+    <table cellpadding="6" cellspacing="6" *ngIf="!success">
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('name.first')!=-1">First name required</span></td></tr>
+        <tr><td align="right">First Name:</td><td><input type='text' [(ngModel)]="rawDonor.name.first" required/></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('name.last')!=-1">Invalid last name</span></td></tr>
+        <tr><td align="right">Last Name:</td><td><input type='text' [(ngModel)]="rawDonor.name.last" /></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('contact_number')!=-1">Invalid contact number</span></td></tr>
+        <tr><td align="right">Contact Number:</td><td><input type='text' [(ngModel)]="rawDonor.contact_number" required/></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('email')!=-1">Invalid email</span></td></tr>
+        <tr><td align="right">Email:</td><td><input type='text' [(ngModel)]="rawDonor.email" required/></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('blood_group')!=-1">Blood group can be a,b,ab,o/A,B,AB,O +/- (ex: AB+)</span></td></tr>
+        <tr><td align="right">Blood Group:</td><td><input type='text' [(ngModel)]="rawDonor.blood_group" required/></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('coordinates.latitude')!=-1">Select a point on map</span></td></tr>
+        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('coordinates.longitude')!=-1">Select a point on map</span></td></tr>
+        <tr><td align="right"><input type="hidden" [(ngModel)]="rawDonor.coordinates.latitude"/></td>
+            <td><input type="hidden" [(ngModel)]="rawDonor.coordinates.longitude"/></td></tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" (click)="addDonor()" />
+                <input type="button" (click)="closeForm();map.clearAll();" value="Close" />
+            </td>
+        </tr>
+    </table>
+</div>

@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 import 'rxjs/add/operator/toPromise';
 import { Headers, Http, Response, RequestOptions } from "@angular/http";
 import { Observable } from 'rxjs/Observable'
-import {Donor} from "../donor";
+import {Donor, Bounds, RawDonor} from "../objects";
 
 @Injectable()
 export class DonorService {
@@ -18,13 +18,13 @@ export class DonorService {
 
     constructor(private http: Http){ }
 
-    getDonors(): Observable<Donor[]> {
-        return this.http.get(this.donorsUrl)
+    getDonors(bounds:Bounds): Observable<Donor[]> {
+        return this.http.get(`${this.donorsUrl}?bounds=${JSON.stringify(bounds)}`)
             .map(this.extractData)
             .catch(this.handleError);
     }
 
-    getDonor(id: string): Observable<Donor> {
+    getDonor(id: string): Observable<any> {
         const url = `${this.donorsUrl}/${id}`;
         return this.http.get(url)
                 .map(this.extractData)
@@ -46,7 +46,7 @@ export class DonorService {
             .catch(this.handleError)
     }
 
-    del(id:String):Observable<Donor>{
+    del(id:String):Observable<any>{
         let url = `${this.donorsUrl}/${id}`;
         return this.http.delete(url, {headers: this.headers})
             .map(this.extractData)
@@ -55,6 +55,7 @@ export class DonorService {
 
     private extractData(res: Response){
         let body = res.json();
+        console.log(body.data);
         return body.data || body.status || {};
     }
 

@@ -20,6 +20,7 @@ var DonorComponent = (function () {
         this.donorService = donorService;
         this.router = router;
         this.errors = [];
+        this.component_name = "donor";
         this.rawDonor = {
             name: {
                 first: '',
@@ -33,7 +34,12 @@ var DonorComponent = (function () {
                 longitude: 200
             }
         };
+        this.host = window.location.host;
+        this.helpText = new core_1.EventEmitter();
     }
+    DonorComponent.prototype.ngOnInit = function () {
+        this.helpText.emit("Click on any point on map to fill your details and save to donors list");
+    };
     DonorComponent.prototype.addDonor = function () {
         var _this = this;
         if (this.validate()) {
@@ -71,15 +77,25 @@ var DonorComponent = (function () {
             this.errors.push('email');
             err = true;
         }
-        if (!(/^(a|b|o|ab)(\+|\-)$/.test(rawDonor.blood_group))) {
+        if (!(/^(a|b|o|ab)(\+|\-)$/.test(rawDonor.blood_group.toLowerCase()))) {
             this.errors.push('blood_group');
             err = true;
         }
         return !(err);
     };
-    DonorComponent.prototype.coordsRecieved = function (coordinates) {
+    DonorComponent.prototype.setCoords = function (coordinates) {
         this.rawDonor.coordinates = coordinates;
     };
+    DonorComponent.prototype.closeForm = function () {
+        this.rawDonor.coordinates = {
+            latitude: 100,
+            longitude: 200
+        };
+    };
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], DonorComponent.prototype, "helpText", void 0);
     DonorComponent = __decorate([
         core_1.Component({
             selector: 'donor',

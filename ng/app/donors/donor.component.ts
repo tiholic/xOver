@@ -3,8 +3,8 @@
  */
 
 
-import {Component, Input, Output} from "@angular/core";
-import {Donor, RawDonor} from "../donor";
+import {Component, Output, EventEmitter, OnInit} from "@angular/core";
+import {Donor, RawDonor, PrivateDonor} from "../objects";
 import {DonorService} from "./donor.service";
 import {Router} from "@angular/router";
 import {MapComponent} from "../maps/map.component";
@@ -15,11 +15,12 @@ import {MapComponent} from "../maps/map.component";
     directives:[MapComponent],
     providers: [DonorService]
 })
-export class DonorComponent{
+export class DonorComponent implements OnInit{
     errorMessage:string;
     errors:string[] = [];
     success:any;
-    donor: Donor;
+    component_name:string="donor";
+    donor: PrivateDonor;
     rawDonor: RawDonor = {
         name:{
             first: '',
@@ -33,11 +34,17 @@ export class DonorComponent{
             longitude: 200
         }
     };
+    host:string = window.location.host;
+    @Output() helpText = new EventEmitter();
 
     constructor(
         private donorService:DonorService,
         private router: Router
     ){ }
+
+    ngOnInit(){
+        this.helpText.emit("Click on any point on map to fill your details and save to donors list");
+    }
 
     addDonor():void{
         if(this.validate()) {
@@ -81,14 +88,21 @@ export class DonorComponent{
             this.errors.push('email');
             err = true;
         }
-        if(!(/^(a|b|o|ab)(\+|\-)$/.test(rawDonor.blood_group))){
+        if(!(/^(a|b|o|ab)(\+|\-)$/.test(rawDonor.blood_group.toLowerCase()))){
             this.errors.push('blood_group');
             err = true;
         }
         return !(err);
     }
 
-    coordsRecieved(coordinates):void{
+    setCoords(coordinates):void{
         this.rawDonor.coordinates = coordinates;
+    }
+
+    closeForm():void{
+        this.rawDonor.coordinates = {
+            latitude: 100,
+            longitude: 200
+        }
     }
 }

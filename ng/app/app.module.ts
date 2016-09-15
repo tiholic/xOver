@@ -13,6 +13,7 @@ import {MapComponent} from "./maps/map.component";
 import { DonorComponent } from "./donors/donor.component";
 import {DonorService} from "./donors/donor.service";
 import {PatientComponent} from "./patients/patient.component";
+import {DonorDetailComponent} from "./donors/donor-detail.component";
 
 @NgModule({
     imports: [
@@ -26,7 +27,8 @@ import {PatientComponent} from "./patients/patient.component";
         AppComponent,
         MapComponent,
         DonorComponent,
-        PatientComponent
+        PatientComponent,
+        DonorDetailComponent
     ],
     providers: [ DonorService ],
     bootstrap: [ AppComponent ]
