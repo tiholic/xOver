@@ -18,6 +18,7 @@ h1 {
     margin-bottom: 0;
     padding: 1.7em;
     display: inline-block;
+    float: right;
 }
 h2 {
     font-size: 2em;
@@ -25,24 +26,34 @@ h2 {
     padding-top: 0;
 }
 nav{
-    float: right;
+    display: inline-block;
+    height: 100%;
+    /*position: absolute;*/
 }
 nav a {
-    height: 1em;
-    padding: 3.4em;
     text-decoration: none;
-    margin-top: -1px;
-    margin-left: -0.3em;
-    display: inline-block;
 }
 nav a:visited {
     color: white
 }
 nav a:hover {
     color: teal;
-    background-color: white;
 }
 nav a.active {
     color: teal;
+}
+
+div.routerContainer{
+    display: inline-block;
+    padding:3em 0 0 0;
+}
+
+div.routerContainer span{
+    padding: 6em 6em 3em 6em;
+}
+
+nav a.active div.routerContainer span, nav a:hover div.routerContainer span{
     background-color: white;
+    color: teal;
+    border-radius: 0.25em 0.25em 0 0;
 }

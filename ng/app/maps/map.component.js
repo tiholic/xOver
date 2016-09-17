@@ -91,9 +91,6 @@ var MapComponent = (function () {
                             min: minBounds,
                             max: maxBounds
                         };
-                        console.log('\t\t', bounds.max.latitude);
-                        console.log(bounds.min.longitude, '\t\t', bounds.max.longitude);
-                        console.log('\t\t', bounds.min.latitude);
                         s.loadDonors(bounds);
                     }
                 }, 500);
@@ -194,11 +191,11 @@ var MapComponent = (function () {
     MapComponent.prototype.getTemplateForDonor = function (donor) {
         return {
             "title": donor.name.first + " " + donor.name.last,
-            "content": "\n                    <table>\n                        <tr><td>Name</td><td>" + donor.name.first + " " + donor.name.last + "</td></tr>    \n                        <tr><td>Blood Group</td><td>" + donor.blood_group.toUpperCase() + "</td></tr>    \n                        <tr><td>Contact Number</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.contact_number + "'\">(Click To Show)</a></td></tr>    \n                        <tr><td>Email</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.email + "'\">(Click To Show)</a></td></tr>    \n                    </table>\n                "
+            "content": this.getPopupContent(donor)
         };
     };
-    MapComponent.prototype.addOnlyDonorToMap = function (donor) {
-        this.addPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
+    MapComponent.prototype.getPopupContent = function (donor) {
+        return "\n                    <table data-donorId=\"" + donor._id + "\">\n                        <tr><td>Name</td><td>" + donor.name.first + " " + donor.name.last + "</td></tr>    \n                        <tr><td>Blood Group</td><td>" + donor.blood_group.toUpperCase() + "</td></tr>    \n                        <tr><td>Contact Number</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.contact_number + "'\">(Click To Show)</a></td></tr>    \n                        <tr><td>Email</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.email + "'\">(Click To Show)</a></td></tr>    \n                    </table>\n                ";
     };
     MapComponent.prototype.addDonorToMap = function (donor) {
         this.appendPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
@@ -206,10 +203,22 @@ var MapComponent = (function () {
     MapComponent.prototype.updateDonorOnMap = function (donor) {
         this.removeGraphic(this.graphics[donor._id]);
         this.appendPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
+        this.updatePopup(donor, false);
     };
     MapComponent.prototype.removeDonorFromMap = function (donor) {
         this.removeGraphic(this.graphics[donor._id]);
         delete this.graphics[donor._id];
+        this.updatePopup(donor, true);
+    };
+    MapComponent.prototype.updatePopup = function (donor, remove) {
+        if (this.view.popup.visible && this.view.popup._bodyContentNode.getElementsByTagName('table')[0].dataset.donorid == donor._id) {
+            if (remove) {
+                this.view.popup._closeNode.click();
+            }
+            else {
+                this.view.popup.content = this.getPopupContent(donor);
+            }
+        }
     };
     MapComponent.prototype.loadDonors = function (bounds) {
         var _this = this;

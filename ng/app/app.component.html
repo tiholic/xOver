@@ -2,8 +2,20 @@
     <error></error>
     <h1>{{title}}</h1>
     <nav>
-        <a routerLink="/donors" routerLinkActive="active">Donor</a>
-        <a routerLink="/patients" routerLinkActive="active">Patient</a>
+        <a routerLink="/donors" routerLinkActive="active">
+            <div class="routerContainer">
+                <span>
+                    I Would Like to donate Blood
+                </span>
+            </div>
+        </a>
+        <a routerLink="/patients" routerLinkActive="active">
+            <div class="routerContainer">
+                <span>
+                    I am in need of blood
+                </span>
+            </div>
+        </a>
     </nav>
     <div class="help">{{help}}</div>
 </header>

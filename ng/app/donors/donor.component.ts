@@ -33,6 +33,7 @@ export class DonorComponent implements OnInit{
         }
     };
     host:string = window.location.host;
+    info:boolean=true;
     @Output() helpText = new EventEmitter();
 
     constructor(
@@ -95,6 +96,7 @@ export class DonorComponent implements OnInit{
 
     setCoords(coordinates):void{
         this.rawDonor.coordinates = coordinates;
+        this.info=false;
     }
 
     closeForm():void{
@@ -102,6 +104,7 @@ export class DonorComponent implements OnInit{
             latitude: 100,
             longitude: 200
         }
+        this.info = true;
     }
 
     resetForm():void{
@@ -119,5 +122,6 @@ export class DonorComponent implements OnInit{
             }
         };
         this.success = false;
+        this.info = true;
     }
 }

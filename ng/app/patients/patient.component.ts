@@ -9,7 +9,12 @@ import * as io from "socket.io-client";
 
 @Component({
     selector: 'patient',
-    template: '<map-component [parent_component]="component_name" #map></map-component>',
+    template: `<map-component [parent_component]="component_name" #map></map-component>
+                <div *ngIf="info" class="info">
+                    <i>info</i>
+                    Click on any pin to choose your location.
+                </div>
+                `,
     providers: [DonorService]
 })
 export class PatientComponent implements OnInit, OnDestroy, AfterViewInit{

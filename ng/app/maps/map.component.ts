@@ -124,9 +124,6 @@ export class MapComponent implements OnInit{
                                 min: minBounds,
                                 max: maxBounds
                             };
-                            console.log('\t\t',bounds.max.latitude);
-                            console.log(bounds.min.longitude,'\t\t',bounds.max.longitude);
-                            console.log('\t\t',bounds.min.latitude);
                             s.loadDonors(bounds);
                         }
                     }, 500);
@@ -243,19 +240,19 @@ export class MapComponent implements OnInit{
     getTemplateForDonor(donor:Donor){
         return {
             "title": `${donor.name.first} ${donor.name.last}`,
-            "content": `
-                    <table>
+            "content": this.getPopupContent(donor)
+            }
+    }
+
+    getPopupContent(donor:Donor){
+        return `
+                    <table data-donorId="${donor._id}">
                         <tr><td>Name</td><td>${donor.name.first} ${donor.name.last}</td></tr>    
                         <tr><td>Blood Group</td><td>${donor.blood_group.toUpperCase()}</td></tr>    
                         <tr><td>Contact Number</td><td><a href="javascript:void(0)" onclick="this.parentElement.innerHTML='${donor.contact_number}'">(Click To Show)</a></td></tr>    
                         <tr><td>Email</td><td><a href="javascript:void(0)" onclick="this.parentElement.innerHTML='${donor.email}'">(Click To Show)</a></td></tr>    
                     </table>
-                `
-            }
-    }
-
-    addOnlyDonorToMap(donor:Donor):any{
-        this.addPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
+                `;
     }
 
     addDonorToMap(donor:Donor):any{
@@ -265,11 +262,23 @@ export class MapComponent implements OnInit{
     updateDonorOnMap(donor:Donor):any{
         this.removeGraphic(this.graphics[donor._id]);
         this.appendPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
+        this.updatePopup(donor, false);
     }
 
     removeDonorFromMap(donor:Donor):any{
         this.removeGraphic(this.graphics[donor._id]);
         delete this.graphics[donor._id];
+        this.updatePopup(donor, true);
+    }
+
+    updatePopup(donor:Donor, remove){
+        if(this.view.popup.visible && this.view.popup._bodyContentNode.getElementsByTagName('table')[0].dataset.donorid == donor._id){
+            if(remove){
+                this.view.popup._closeNode.click();
+            }else{
+                this.view.popup.content = this.getPopupContent(donor);
+            }
+        }
     }
 
     loadDonors(bounds:Bounds):void{

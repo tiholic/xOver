@@ -47,7 +47,7 @@ var PatientComponent = (function () {
     PatientComponent = __decorate([
         core_1.Component({
             selector: 'patient',
-            template: '<map-component [parent_component]="component_name" #map></map-component>',
+            template: "<map-component [parent_component]=\"component_name\" #map></map-component>\n                <div *ngIf=\"info\" class=\"info\">\n                    <i>info</i>\n                    Click on any pin to choose your location.\n                </div>\n                ",
             providers: [donor_service_1.DonorService]
         }), 
         __metadata('design:paramtypes', [])

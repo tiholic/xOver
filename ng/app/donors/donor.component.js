@@ -34,6 +34,7 @@ var DonorComponent = (function () {
             }
         };
         this.host = window.location.host;
+        this.info = true;
         this.helpText = new core_1.EventEmitter();
     }
     DonorComponent.prototype.ngOnInit = function () {
@@ -84,12 +85,14 @@ var DonorComponent = (function () {
     };
     DonorComponent.prototype.setCoords = function (coordinates) {
         this.rawDonor.coordinates = coordinates;
+        this.info = false;
     };
     DonorComponent.prototype.closeForm = function () {
         this.rawDonor.coordinates = {
             latitude: 100,
             longitude: 200
         };
+        this.info = true;
     };
     DonorComponent.prototype.resetForm = function () {
         this.rawDonor = {
@@ -106,6 +109,7 @@ var DonorComponent = (function () {
             }
         };
         this.success = false;
+        this.info = true;
     };
     __decorate([
         core_1.Output(), 

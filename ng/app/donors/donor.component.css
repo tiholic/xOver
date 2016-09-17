@@ -49,7 +49,7 @@ input {
 }
 
 button{
-    background: teal;   //#03A9F4;
+    background: teal;   /*#03A9F4;*/
     padding: 1em;
     color: white;
     font-family: inherit;
@@ -74,4 +74,18 @@ div.success{
     text-align: center;
     margin-top: 15em;
     line-height: 1.5em;
+}
+
+div.info{
+    position: absolute;
+    top: 10em;
+    right: 0;
+    background-color: white;
+    color: teal;
+    padding: 3em;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+div.info i{
+    color: #fafafa;
 }
