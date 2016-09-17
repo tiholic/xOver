@@ -25,6 +25,18 @@ function send500(res, err) {
     });
 }
 
+function sendError(res, err){
+    console.log("INVALID INPUT", err);
+    res.send({
+        "status": {
+            "status_code": 400,
+            "success": false,
+            "message": "Validation failed",
+            "detail": err
+        }
+    });
+}
+
 function sendSuccess(res) {
     res.send({
         "status": {
@@ -50,5 +62,6 @@ module.exports = {
     send404: send404,
     send500: send500,
     sendSuccess: sendSuccess,
-    sendData: sendData
+    sendData: sendData,
+    sendError: sendError
 };

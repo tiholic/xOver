@@ -7,6 +7,7 @@ var crypto = require("crypto");
 var sockets = require('../sockets/ti.socket.io');
 var LONGITUDE_MAX = 180;
 var LATITUDE_MAX = 90;
+var responseHandler = require('../responseHandler');
 
 function broadcastOtherUsers(operation, data){
     if(operation=="post"||operation=="put"||operation=="del") {
@@ -23,6 +24,37 @@ function preSave(req, data, operation){
         data.private_id = crypto.randomBytes(20).toString('hex');
     }
     return data;
+}
+
+function validate(data){
+    var latCheck = true;
+    var lonCheck = true;
+    if(data.coordinates){
+        console.log(data.coordinates.latitude, data.coordinates.longitude);
+        console.log((0 <= data.coordinates.latitude)&&(data.coordinates.latitude <= LATITUDE_MAX*2));
+        console.log((0 <= data.coordinates.longitude)&&(data.coordinates.longitude <= LONGITUDE_MAX*2));
+        latCheck = ((0 <= data.coordinates.latitude)&&(data.coordinates.latitude <= LATITUDE_MAX*2));
+        lonCheck = ((0 <= data.coordinates.longitude)&&(data.coordinates.longitude <= LONGITUDE_MAX*2));
+        console.log(latCheck, lonCheck);
+    }else{
+        latCheck = lonCheck = false;
+    }
+    var numCheck = (/^(00|\+)[0-9]{12}$/.test(data.contact_number));
+    var emailCheck = (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email));
+    var bgCheck = data.blood_group?(/^(a|b|o|ab)(\+|\-)$/.test(data.blood_group.toLowerCase())):false;
+    var nameChk = data.name && data.name.first && true;
+    var errors = [];
+    console.log(!latCheck, !lonCheck);
+    if(!latCheck){errors.push('invalid latitude')}
+    if(!lonCheck){errors.push('invalid longitude')}
+    if(!numCheck){errors.push('invalid contact number')}
+    if(!emailCheck){errors.push('invalid email id')}
+    if(!bgCheck){errors.push('blood group')}
+    if(!nameChk){errors.push('name.first')}
+    if(errors.length){
+        return {valid:false, detail:errors};
+    }
+    return {valid:true};
 }
 
 function transformData(request, data, operation){
@@ -60,7 +92,7 @@ function queryHandler(request, operation){
     if(operation=='get'||operation=='put'){
         var new_query = {_id:request.params.id};
         if(request.query.donor_private){
-            new_query.private_id = request.query.donor_private
+            new_query.private_id = request.query.donor_private;
         }else if(operation=='put'){
             throw new Error('Not Authenticated/Improper Url');
         }
@@ -71,12 +103,7 @@ function queryHandler(request, operation){
             adjustCoordinates(bounds.min, 'set');
             adjustCoordinates(bounds.max, 'set');
             var new_query = {};
-            console.log((bounds.min.longitude > bounds.max.longitude));
             if(bounds.min.longitude > bounds.max.longitude){
-                // var longitudeQuery = {$or:[
-                //     {"coordinates.longitude":{$gte: bounds.min.longitude, $lte: LONGITUDE_MAX+LONGITUDE_MAX}},
-                //     {"coordinates.longitude":{$gte: -(LONGITUDE_MAX-LONGITUDE_MAX), $lte:bounds.max.longitude}}
-                // ]};
                 var longitudeQuery = {"coordinates.longitude":{$gte: 0, $lte: 2*LONGITUDE_MAX}};
             }else {
                 var longitudeQuery = {"coordinates.longitude":{$gte: bounds.min.longitude, $lte: bounds.max.longitude}};
@@ -86,7 +113,6 @@ function queryHandler(request, operation){
                 longitudeQuery,
                 latitudeQuery
             ];
-            console.log(JSON.stringify(new_query));
             return new_query;
         }
     }
@@ -97,5 +123,6 @@ module.exports = {
     ccb: broadcastOtherUsers,
     preSave: preSave,
     transformData: transformData,
-    queryHandler: queryHandler
+    queryHandler: queryHandler,
+    validate:validate
 };

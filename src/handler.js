@@ -2,29 +2,30 @@
  * Created by rohit on 12/9/16.
  */
 
-var response = require('./responseHandler');
+var responseHandler = require('./responseHandler');
 
 function handler(options) {
     var self = this;
     var model = options.model;
-    var operation, request;
+    var operation, request, response;
     self.getList = function(req, res) {
         try {
             operation = "get-list";
             request = req;
+            response = res;
             model.find(getQuery(), function (err, data) {
                 if (err) {
-                    response.send500(res, err);
+                    responseHandler.send500(res, err);
                 }
                 if (data) {
                     data = callback(data);
-                    response.sendData(res, data);
+                    responseHandler.sendData(res, data);
                 } else {
-                    response.send404(res);
+                    responseHandler.send404(res);
                 }
             });
         }catch (e){
-            response.send500(res, e);
+            responseHandler.send500(res, e);
         }
     };
 
@@ -32,19 +33,20 @@ function handler(options) {
         try {
             operation = "get";
             request = req;
+            response = res;
             model.findOne(getQuery(), function (err, data) {
                 if (err) {
-                    response.send500(res, err);
+                    responseHandler.send500(res, err);
                 }
                 if (data) {
                     data = callback(data);
-                    response.sendData(res, data);
+                    responseHandler.sendData(res, data);
                 } else {
-                    response.send404(res);
+                    responseHandler.send404(res);
                 }
             });
         }catch (e){
-            response.send500(res, e);
+            responseHandler.send500(res, e);
         }
     };
 
@@ -52,23 +54,27 @@ function handler(options) {
         try{
             operation = "post";
             request = req;
-            var newData = model(preSave());
-            newData.save(function (err) {
-                if (err) {
-                    response.send500(res, err);
-                } else {
-                    model.findById(newData._id, function (err, data) {
-                        if (err) {
-                            response.send404(res);
-                        } else {
-                            data = callback(data);
-                            response.sendData(res, data);
-                        }
-                    });
-                }
-            });
+            response = res;
+            var data = preSave();
+            if(data) {
+                var newData = model(data);
+                newData.save(function (err) {
+                    if (err) {
+                        responseHandler.send500(res, err);
+                    } else {
+                        model.findById(newData._id, function (err, data) {
+                            if (err) {
+                                responseHandler.send404(res);
+                            } else {
+                                data = callback(data);
+                                responseHandler.sendData(res, data);
+                            }
+                        });
+                    }
+                });
+            }
         }catch (e){
-            response.send500(res, e);
+            responseHandler.send500(res, e);
         }
     };
 
@@ -76,24 +82,28 @@ function handler(options) {
         try{
             operation = 'put';
             request = req;
-            model.findOneAndUpdate(
-                getQuery(),
-                {$set: preSave()},
-                {new: true},
-                function (err, data) {
-                    if (err) {
-                        response.send500(res, err)
+            response = res;
+            var data = preSave();
+            if(data) {
+                model.findOneAndUpdate(
+                    getQuery(),
+                    {$set: data},
+                    {new: true},
+                    function (err, data) {
+                        if (err) {
+                            responseHandler.send500(res, err)
+                        }
+                        if (data) {
+                            data = callback(data);
+                            responseHandler.sendData(res, data);
+                        } else {
+                            responseHandler.send404(res);
+                        }
                     }
-                    if (data) {
-                        data = callback(data);
-                        response.sendData(res, data);
-                    } else {
-                        response.send404(res);
-                    }
-                }
-            );
+                );
+            }
         }catch (e){
-            response.send500(res, e);
+            responseHandler.send500(res, e);
         }
     };
 
@@ -101,16 +111,17 @@ function handler(options) {
         try {
             operation = 'del';
             request = req;
+            response = res;
             model.findByIdAndRemove(req.params.id, function (err, data) {
                 if (err) {
-                    response.send500(res, err);
+                    responseHandler.send500(res, err);
                 } else {
                     callback(data, false);
-                    response.sendSuccess(res);
+                    responseHandler.sendSuccess(res);
                 }
             });
         }catch (e){
-            response.send500(res, e);
+            responseHandler.send500(res, e);
         }
     };
 
@@ -127,7 +138,15 @@ function handler(options) {
     function preSave(){
         var data = request.body;
         if(options.handler.preSave){
-            return options.handler.preSave(request, data, operation);
+            data = options.handler.preSave(request, data, operation);
+        }
+        if(options.handler.validate){
+            var validationRes = options.handler.validate(data);
+            if(validationRes.valid){
+                return data;
+            }else{
+                responseHandler.sendError(response, validationRes.detail);
+            }
         }else{
             return data;
         }

@@ -22,12 +22,12 @@ var DonorComponent = (function () {
         this.component_name = "donor";
         this.rawDonor = {
             name: {
-                first: 'Rohit',
-                last: 'Reddy'
+                first: '',
+                last: ''
             },
-            contact_number: '00917382393393',
-            email: 'rr.16566@gmail.com',
-            blood_group: 'B+',
+            contact_number: '',
+            email: '',
+            blood_group: '',
             coordinates: {
                 latitude: 100,
                 longitude: 200
