@@ -134,7 +134,6 @@ export class MapComponent implements OnInit{
         }else{
             this.view.on("click",
                 evt => {
-                console.log(evt.mapPoint);
                     var coords: Coords = this.getCoords(evt.mapPoint);
                     /*  var address = (new s.TaskLocator()).locationToAddress(s.geometry, 0);
                      console.log(address);
@@ -280,12 +279,13 @@ export class MapComponent implements OnInit{
                 this.view.popup._closeNode.click();
             }else{
                 this.view.popup.content = this.getPopupContent(donor);
-                debugger;
 /*                this.view.popup.location = new this.Point({
-                                                        x:donor.coordinates.longitude,
-                                                        y:donor.coordinates.latitude,
+                                                        longitude:donor.coordinates.longitude,
+                                                        latitude:donor.coordinates.latitude,
                                                         hasZ:false
-                                                        });*/
+                                                        });
+                this updates the popup to center. Incorrect.
+                                                        */
             }
         }
     }

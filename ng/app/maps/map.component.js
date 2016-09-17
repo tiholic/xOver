@@ -101,7 +101,6 @@ var MapComponent = (function () {
         }
         else {
             this.view.on("click", function (evt) {
-                console.log(evt.mapPoint);
                 var coords = _this.getCoords(evt.mapPoint);
                 /*  var address = (new s.TaskLocator()).locationToAddress(s.geometry, 0);
                  console.log(address);
@@ -221,7 +220,6 @@ var MapComponent = (function () {
             }
             else {
                 this.view.popup.content = this.getPopupContent(donor);
-                debugger;
             }
         }
     };
