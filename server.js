@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var debug = require('debug')('mean.ti:server');
 var path = require('path');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');            //parses information from POST
@@ -72,7 +71,6 @@ db.on("open", function(){
         });
     });
 
-    debug("process.env.PORT : "+process.env.PORT);
     port = normalizePort(process.env.PORT || '3000');
     server = http.createServer(app);
     server.listen(port);
@@ -117,7 +115,6 @@ function onListening() {
     var address = server.address();
     var bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + address.port;
     console.log('App running at ' + bind);
-    debug('Listening on ' + bind);
 }
 
 module.exports = io;
