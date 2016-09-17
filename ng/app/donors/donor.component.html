@@ -13,7 +13,7 @@
     <div class="donor-container" *ngIf="rawDonor.coordinates.latitude>=-90 && rawDonor.coordinates.latitude <= 90
                 && rawDonor.coordinates.longitude>=-180 && rawDonor.coordinates.latitude <= 180">
         <table cellpadding="6" cellspacing="6">
-            <tr><td>First Name:</td>
+            <tr><td style="min-width:8em">First Name:</td>
                 <td>
                     <input type='text' [(ngModel)]="rawDonor.name.first" />
                     <br>

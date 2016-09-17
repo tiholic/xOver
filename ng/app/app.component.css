@@ -18,7 +18,8 @@ h1 {
     margin-bottom: 0;
     padding: 1.7em;
     display: inline-block;
-    float: right;
+    position: absolute;
+    right: 0;
 }
 h2 {
     font-size: 2em;
@@ -49,7 +50,8 @@ div.routerContainer{
 }
 
 div.routerContainer span{
-    padding: 6em 6em 3em 6em;
+    padding: 6em 2em 3em 2em;
+    background-color: #009688;
 }
 
 nav a.active div.routerContainer span, nav a:hover div.routerContainer span{
