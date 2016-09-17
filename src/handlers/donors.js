@@ -30,12 +30,8 @@ function validate(data){
     var latCheck = true;
     var lonCheck = true;
     if(data.coordinates){
-        console.log(data.coordinates.latitude, data.coordinates.longitude);
-        console.log((0 <= data.coordinates.latitude)&&(data.coordinates.latitude <= LATITUDE_MAX*2));
-        console.log((0 <= data.coordinates.longitude)&&(data.coordinates.longitude <= LONGITUDE_MAX*2));
         latCheck = ((0 <= data.coordinates.latitude)&&(data.coordinates.latitude <= LATITUDE_MAX*2));
         lonCheck = ((0 <= data.coordinates.longitude)&&(data.coordinates.longitude <= LONGITUDE_MAX*2));
-        console.log(latCheck, lonCheck);
     }else{
         latCheck = lonCheck = false;
     }
@@ -44,7 +40,6 @@ function validate(data){
     var bgCheck = data.blood_group?(/^(a|b|o|ab)(\+|\-)$/.test(data.blood_group.toLowerCase())):false;
     var nameChk = data.name && data.name.first && true;
     var errors = [];
-    console.log(!latCheck, !lonCheck);
     if(!latCheck){errors.push('invalid latitude')}
     if(!lonCheck){errors.push('invalid longitude')}
     if(!numCheck){errors.push('invalid contact number')}
