@@ -54,6 +54,7 @@ var DonorDetailComponent = (function () {
     DonorDetailComponent.prototype.pointDonor = function () {
         this.mapInitialised = true;
         this.mapComponent.addDonorToMap(this.donor);
+        this.mapComponent.center(this.donor.coordinates);
     };
     DonorDetailComponent.prototype.updateDonor = function () {
         var _this = this;

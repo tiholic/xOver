@@ -1,9 +1,7 @@
 var mongoose = require('mongoose');
-var logger = require('morgan');
 var debug = require('debug')('mean.ti:server');
 var path = require('path');
 var favicon = require('serve-favicon');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');            //parses information from POST
 var express = require('express');
 var http = require('http');
@@ -24,10 +22,8 @@ db.on("open", function(){
     console.log("_____________________________}");
     app = express();
     app.use(favicon(path.join(__dirname, 'favicon.ico')));
-    app.use(logger('dev'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(cookieParser());
     app.use(express.static(__dirname));
 
     var methodOverride = require('method-override');    //used to manipulate POST

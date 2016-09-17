@@ -59,6 +59,7 @@ export class DonorDetailComponent implements AfterViewInit{
     pointDonor():void{
         this.mapInitialised = true;
         this.mapComponent.addDonorToMap(this.donor);
+        this.mapComponent.center(this.donor.coordinates);
     }
 
     updateDonor():void{

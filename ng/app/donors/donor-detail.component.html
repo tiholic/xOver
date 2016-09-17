@@ -3,7 +3,7 @@
     <span>You are successfully removed from donors list</span>
 </div>
 <div *ngIf="!deleted" class="dm-container">
-    <map-component [parent_component]="component_name" (coordsReceived)="setCoords($event)" (mapModulesInitialised)="pointDonor()" #map></map-component>
+    <map-component [parent_component]="component_name" [getLocate]="false" (coordsReceived)="setCoords($event)" (mapModulesInitialised)="pointDonor()" #map></map-component>
     <div class="donor-container">
         <div class="updated" *ngIf="updated">Details updated successfully</div>
         <table cellpadding="6" cellspacing="6">

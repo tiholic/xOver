@@ -6,7 +6,6 @@
 import {Component, OnInit, Output, EventEmitter, Input} from "@angular/core";
 import {DonorService} from "../donors/donor.service";
 import {Coords, Bounds, Donor} from "../objects";
-import {min} from "rxjs/operator/min";
 declare var requireModules: any;
 
 @Component({
@@ -44,6 +43,7 @@ export class MapComponent implements OnInit{
     @Output() coordsReceived = new EventEmitter();
     @Output() mapModulesInitialised = new EventEmitter();
     @Input() parent_component:string;
+    @Input() getLocate=true;
     extentChangeCounter:number = 0;
 
     constructor(private donorService:DonorService){}
@@ -76,7 +76,6 @@ export class MapComponent implements OnInit{
             /*this.TaskLocator = TaskLocator;*/
             this.createMap(Map, MapView, Search);
             this.createSymbol();
-            this.mapModulesInitialised.emit();
         });
     }
 
@@ -94,6 +93,7 @@ export class MapComponent implements OnInit{
         this.view.then(
             () => {
                 this.setScale(null);
+                this.mapModulesInitialised.emit();
                 var searchWidget = new Search({
                     view: this.view,
                 });
@@ -104,7 +104,9 @@ export class MapComponent implements OnInit{
                     allPlaceholder: "search for Donors"
                 });
                 this.addEventsToMap();
-                this.getLocationFromBrowser();
+                if(this.getLocate) {
+                    this.getLocationFromBrowser();
+                }
             },
             err => console.log("failed to load view resources", err)
         );
@@ -132,6 +134,7 @@ export class MapComponent implements OnInit{
         }else{
             this.view.on("click",
                 evt => {
+                console.log(evt.mapPoint);
                     var coords: Coords = this.getCoords(evt.mapPoint);
                     /*  var address = (new s.TaskLocator()).locationToAddress(s.geometry, 0);
                      console.log(address);
@@ -213,7 +216,7 @@ export class MapComponent implements OnInit{
     }
 
     center(coords):void{
-        this.setScale((8*Math.pow(10,4)), false);
+        this.setScale((8*Math.pow(10,5)), false);
         this.view.goTo([coords.longitude, coords.latitude]);
     }
 
@@ -277,6 +280,12 @@ export class MapComponent implements OnInit{
                 this.view.popup._closeNode.click();
             }else{
                 this.view.popup.content = this.getPopupContent(donor);
+                debugger;
+/*                this.view.popup.location = new this.Point({
+                                                        x:donor.coordinates.longitude,
+                                                        y:donor.coordinates.latitude,
+                                                        hasZ:false
+                                                        });*/
             }
         }
     }

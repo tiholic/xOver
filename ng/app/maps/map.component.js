@@ -19,6 +19,7 @@ var MapComponent = (function () {
         this.graphics = {};
         this.coordsReceived = new core_1.EventEmitter();
         this.mapModulesInitialised = new core_1.EventEmitter();
+        this.getLocate = true;
         this.extentChangeCounter = 0;
     }
     MapComponent.prototype.ngOnInit = function () {
@@ -49,7 +50,6 @@ var MapComponent = (function () {
             /*this.TaskLocator = TaskLocator;*/
             _this.createMap(Map, MapView, Search);
             _this.createSymbol();
-            _this.mapModulesInitialised.emit();
         });
     };
     MapComponent.prototype.createMap = function (Map, MapView, Search) {
@@ -65,6 +65,7 @@ var MapComponent = (function () {
         });
         this.view.then(function () {
             _this.setScale(null);
+            _this.mapModulesInitialised.emit();
             var searchWidget = new Search({
                 view: _this.view,
             });
@@ -74,7 +75,9 @@ var MapComponent = (function () {
                 allPlaceholder: "search for Donors"
             });
             _this.addEventsToMap();
-            _this.getLocationFromBrowser();
+            if (_this.getLocate) {
+                _this.getLocationFromBrowser();
+            }
         }, function (err) { return console.log("failed to load view resources", err); });
     };
     MapComponent.prototype.addEventsToMap = function () {
@@ -98,6 +101,7 @@ var MapComponent = (function () {
         }
         else {
             this.view.on("click", function (evt) {
+                console.log(evt.mapPoint);
                 var coords = _this.getCoords(evt.mapPoint);
                 /*  var address = (new s.TaskLocator()).locationToAddress(s.geometry, 0);
                  console.log(address);
@@ -169,7 +173,7 @@ var MapComponent = (function () {
         this.addGraphic(graphic);
     };
     MapComponent.prototype.center = function (coords) {
-        this.setScale((8 * Math.pow(10, 4)), false);
+        this.setScale((8 * Math.pow(10, 5)), false);
         this.view.goTo([coords.longitude, coords.latitude]);
     };
     MapComponent.prototype.setScale = function (ratio, zoomout) {
@@ -217,6 +221,7 @@ var MapComponent = (function () {
             }
             else {
                 this.view.popup.content = this.getPopupContent(donor);
+                debugger;
             }
         }
     };
@@ -242,6 +247,10 @@ var MapComponent = (function () {
         core_1.Input(), 
         __metadata('design:type', String)
     ], MapComponent.prototype, "parent_component", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Object)
+    ], MapComponent.prototype, "getLocate", void 0);
     MapComponent = __decorate([
         core_1.Component({
             selector: 'map-component',
