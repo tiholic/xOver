@@ -3,6 +3,8 @@
  */
 
 import {Component} from "@angular/core";
+import {enableProdMode} from '@angular/core';
+enableProdMode();
 @Component({
     selector: 'my-app',
     templateUrl: 'ng/app/app.component.html',        //All router links to be added inside this template
