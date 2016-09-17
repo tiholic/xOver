@@ -71,7 +71,7 @@
     "url": "https://github.com/tihorme/mean.ti/issues"
   },
   "engines": {
-    "node": ">= 4.2.1",
-    "npm": ">= 3"
+    "node": ">= 6.2.2",
+    "npm": ">= 3.9.5"
   }
 }
