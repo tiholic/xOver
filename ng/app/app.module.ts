@@ -14,6 +14,7 @@ import { DonorComponent } from "./donors/donor.component";
 import {DonorService} from "./donors/donor.service";
 import {PatientComponent} from "./patients/patient.component";
 import {DonorDetailComponent} from "./donors/donor-detail.component";
+import {ErrorComponent} from "./error/error.component";
 
 @NgModule({
     imports: [
@@ -28,7 +29,8 @@ import {DonorDetailComponent} from "./donors/donor-detail.component";
         MapComponent,
         DonorComponent,
         PatientComponent,
-        DonorDetailComponent
+        DonorDetailComponent,
+        ErrorComponent
     ],
     providers: [ DonorService ],
     bootstrap: [ AppComponent ]

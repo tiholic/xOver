@@ -10,7 +10,6 @@ import * as io from "socket.io-client";
 @Component({
     selector: 'patient',
     template: '<map-component [parent_component]="component_name" #map></map-component>',
-    directives: [MapComponent],
     providers: [DonorService]
 })
 export class PatientComponent implements OnInit, OnDestroy, AfterViewInit{
@@ -35,6 +34,6 @@ export class PatientComponent implements OnInit, OnDestroy, AfterViewInit{
     listenSocketEvents(){
         this.socket.on("donors-add", donor => this.mapComponent.addDonorToMap(donor));
         this.socket.on("donors-update", donor => this.mapComponent.updateDonorOnMap(donor));
-        this.socket.on("donors-delete", donor => {console.log('donor deleted');this.mapComponent.removeDonorFromMap(donor)});
+        this.socket.on("donors-delete", donor => this.mapComponent.removeDonorFromMap(donor));
     }
 }

@@ -1,25 +1,57 @@
-<map-component [parent_component]="component_name" #map></map-component>
-<div class="donor-container">
-    <table cellpadding="6" cellspacing="6">
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('name.first')!=-1">First name required</span></td></tr>
-        <tr><td align="right">First Name:</td><td><input type='text' [(ngModel)]="donor.name.first" required/></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('name.last')!=-1">Invalid last name</span></td></tr>
-        <tr><td align="right">Last Name:</td><td><input type='text' [(ngModel)]="donor.name.last" /></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('contact_number')!=-1">Invalid contact number</span></td></tr>
-        <tr><td align="right">Contact Number:</td><td><input type='text' [(ngModel)]="donor.contact_number" required/></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('email')!=-1">Invalid email</span></td></tr>
-        <tr><td align="right">Email:</td><td><input type='text' [(ngModel)]="donor.email" required/></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('blood_group')!=-1">Blood group can be a,b,ab,o/A,B,AB,O +/- (ex: AB+)</span></td></tr>
-        <tr><td align="right">Blood Group:</td><td><input type='text' [(ngModel)]="donor.blood_group" required/></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('coordinates.latitude')!=-1">Select a point on map</span></td></tr>
-        <tr><td colspan="2" align="center"><span class="error"*ngIf="errors.indexOf('coordinates.longitude')!=-1">Select a point on map</span></td></tr>
-        <tr><td align="right"><input type="hidden" [(ngModel)]="donor.coordinates.latitude"/></td>
-            <td><input type="hidden" [(ngModel)]="donor.coordinates.longitude"/></td></tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input type="submit" (click)="addDonor()" />
-                <input type="button" (click)="closeForm();map.clearAll();" value="Close" />
-            </td>
-        </tr>
-    </table>
+<div *ngIf="deleted" class="success">
+    <h1>Successfully removed</h1>
+    <span>You are successfully removed from donors list</span>
+</div>
+<div *ngIf="!deleted" class="dm-container">
+    <map-component [parent_component]="component_name" (coordsReceived)="setCoords($event)" (mapModulesInitialised)="pointDonor()" #map></map-component>
+    <div class="donor-container">
+        <div class="updated" *ngIf="updated">Details updated successfully</div>
+        <table cellpadding="6" cellspacing="6">
+            <tr><td>First Name:</td>
+                <td>
+                    <input type='text' [(ngModel)]="donor.name.first" />
+                    <br>
+                    <div class="errorbox" *ngIf="errors.indexOf('name.first')!=-1">First name required</div>
+                </td>
+            </tr>
+            <tr><td>Last Name</td>
+                <td>
+                    <input type='text' [(ngModel)]="donor.name.last" />
+                    <br>
+                    <div class="errorbox" *ngIf="errors.indexOf('name.last')!=-1">Invalid last name</div>
+                </td>
+            </tr>
+            <tr><td >Contact Number</td>
+                <td>
+                    <input type='text' [(ngModel)]="donor.contact_number" />
+                    <br>
+                    <div class="errorbox" *ngIf="errors.indexOf('contact_number')!=-1">Invalid contact number. Valid pattern is 00xxxxxxxxxxxx or +xxxxxxxxxxxx</div>
+                </td>
+            </tr>
+            <tr><td>Email ID</td>
+                <td>
+                    <input type='text' [(ngModel)]="donor.email" />
+                    <br>
+                    <div class="errorbox" *ngIf="errors.indexOf('email')!=-1">Invalid Email Id</div>
+                </td>
+            </tr>
+            <tr><td>Blood Group</td>
+                <td>
+                    <input type='text' [(ngModel)]="donor.blood_group" />
+                    <br>
+                    <div class="errorbox" *ngIf="errors.indexOf('blood_group')!=-1">Blood group can be a,b,ab,o/A,B,AB,O +/- (ex: AB+)</div>
+                </td>
+            </tr>
+            <tr><td colspan="2" align="center"><span class="errorbox"*ngIf="errors.indexOf('coordinates.latitude')!=-1">Select a point on map</span></td></tr>
+            <tr><td colspan="2" align="center"><span class="errorbox"*ngIf="errors.indexOf('coordinates.longitude')!=-1">Select a point on map</span></td></tr>
+            <tr><td><input type="hidden" [(ngModel)]="donor.coordinates.latitude"/></td>
+                <td><input type="hidden" [(ngModel)]="donor.coordinates.longitude"/></td></tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <button (click)="updateDonor()" >Update</button>
+                    <button class="del" (click)="deleteDonor();map.clearAll();">Delete</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>

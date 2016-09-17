@@ -12,13 +12,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var donor_component_1 = require("../donors/donor.component");
 var donor_service_1 = require("../donors/donor.service");
 var MapComponent = (function () {
     function MapComponent(donorService) {
         this.donorService = donorService;
         this.graphics = {};
         this.coordsReceived = new core_1.EventEmitter();
+        this.mapModulesInitialised = new core_1.EventEmitter();
+        this.extentChangeCounter = 0;
     }
     MapComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -48,6 +49,7 @@ var MapComponent = (function () {
             /*this.TaskLocator = TaskLocator;*/
             _this.createMap(Map, MapView, Search);
             _this.createSymbol();
+            _this.mapModulesInitialised.emit();
         });
     };
     MapComponent.prototype.createMap = function (Map, MapView, Search) {
@@ -62,7 +64,7 @@ var MapComponent = (function () {
             center: [0, 0]
         });
         this.view.then(function () {
-            _this.setViewExtent(null, null);
+            _this.setScale(null);
             var searchWidget = new Search({
                 view: _this.view,
             });
@@ -79,13 +81,22 @@ var MapComponent = (function () {
         var _this = this;
         if (this.parent_component == "patient") {
             this.view.watch("extent", function (newValue, oldValue, property, object) {
-                var maxBounds = _this.getCoords(_this.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
-                var minBounds = _this.getCoords(_this.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
-                var bounds = {
-                    min: minBounds,
-                    max: maxBounds
-                };
-                _this.loadDonors(bounds);
+                var latestCounter = (++_this.extentChangeCounter);
+                var s = _this;
+                setTimeout(function () {
+                    if (latestCounter == s.extentChangeCounter) {
+                        var maxBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
+                        var minBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
+                        var bounds = {
+                            min: minBounds,
+                            max: maxBounds
+                        };
+                        console.log('\t\t', bounds.max.latitude);
+                        console.log(bounds.min.longitude, '\t\t', bounds.max.longitude);
+                        console.log('\t\t', bounds.min.latitude);
+                        s.loadDonors(bounds);
+                    }
+                }, 500);
             });
         }
         else {
@@ -96,7 +107,7 @@ var MapComponent = (function () {
                  unable to get address: issue from ESRI...
                  */
                 _this.coordsReceived.emit(coords);
-                _this.addPoint(coords);
+                _this.addPoint(coords, null, null);
                 _this.center(coords);
             });
         }
@@ -105,13 +116,13 @@ var MapComponent = (function () {
         // rounding off the decimals to 3 decimals
         if (coords instanceof Array) {
             return {
-                latitude: Math.round(coords[1] * 1000) / 1000,
-                longitude: Math.round(coords[0] * 1000) / 1000,
+                latitude: coords[1],
+                longitude: coords[0],
             };
         }
         return {
-            latitude: Math.round(coords.latitude * 1000) / 1000,
-            longitude: Math.round(coords.longitude * 1000) / 1000,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
         };
     };
     MapComponent.prototype.createSymbol = function () {
@@ -132,17 +143,13 @@ var MapComponent = (function () {
             hasZ: false
         });
     };
-    MapComponent.prototype.createGraphic = function (geometry, attributes) {
+    MapComponent.prototype.createGraphic = function (geometry, popupTemplate) {
         var opts = {
             geometry: geometry,
             symbol: this.symbol
         };
-        if (attributes) {
-            opts['attributes'] = attributes;
-            opts['popupTemplate'] = new this.PopupTemplate({
-                title: "{Name}",
-                content: "{*}" // Displays a table of all the attributes in the popup
-            });
+        if (popupTemplate) {
+            opts['popupTemplate'] = new this.PopupTemplate(popupTemplate);
         }
         return new this.Graphic(opts);
     };
@@ -150,11 +157,11 @@ var MapComponent = (function () {
         this.view.graphics.add(graphic);
     };
     MapComponent.prototype.removeGraphic = function (graphic) {
-        this.view.graphics.add(graphic);
+        this.view.graphics.remove(graphic);
     };
-    MapComponent.prototype.addPoint = function (coords) {
+    MapComponent.prototype.addPoint = function (coords, popupDetails, id) {
         this.clearAll();
-        this.appendPoint(coords, null, null);
+        this.appendPoint(coords, popupDetails, id);
     };
     MapComponent.prototype.appendPoint = function (coords, popupDetails, id) {
         var point = this.createPoint(coords);
@@ -165,16 +172,15 @@ var MapComponent = (function () {
         this.addGraphic(graphic);
     };
     MapComponent.prototype.center = function (coords) {
-        var newScale = (8 * Math.pow(10, 4));
-        this.setViewExtent({ center: [coords.longitude, coords.latitude] }, (newScale < this.view.scale) ? newScale : this.view.scale);
+        this.setScale((8 * Math.pow(10, 4)), false);
+        this.view.goTo([coords.longitude, coords.latitude]);
     };
-    MapComponent.prototype.setViewExtent = function (opts, scale) {
-        if (!opts) {
-            opts = {};
+    MapComponent.prototype.setScale = function (ratio, zoomout) {
+        if (zoomout === void 0) { zoomout = true; }
+        if (ratio && !zoomout) {
+            ratio = (ratio < this.view.scale) ? ratio : this.view.scale;
         }
-        opts.spatialReference = new this.SpatialReference({ wkid: 4326 });
-        this.view.extent = new this.Extent(opts);
-        this.view.scale = scale ? scale : (5 * Math.pow(10, 7));
+        this.view.scale = ratio ? ratio : (5 * Math.pow(10, 7));
     };
     MapComponent.prototype.clearAll = function () {
         this.view.graphics.removeAll();
@@ -187,11 +193,12 @@ var MapComponent = (function () {
     };
     MapComponent.prototype.getTemplateForDonor = function (donor) {
         return {
-            "Name": donor.name.first + " " + donor.name.last,
-            "Blood Group": donor.blood_group.toUpperCase(),
-            "Contact Number": donor.contact_number,
-            "EMail": donor.email
+            "title": donor.name.first + " " + donor.name.last,
+            "content": "\n                    <table>\n                        <tr><td>Name</td><td>" + donor.name.first + " " + donor.name.last + "</td></tr>    \n                        <tr><td>Blood Group</td><td>" + donor.blood_group.toUpperCase() + "</td></tr>    \n                        <tr><td>Contact Number</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.contact_number + "'\">(Click To Show)</a></td></tr>    \n                        <tr><td>Email</td><td><a href=\"javascript:void(0)\" onclick=\"this.parentElement.innerHTML='" + donor.email + "'\">(Click To Show)</a></td></tr>    \n                    </table>\n                "
         };
+    };
+    MapComponent.prototype.addOnlyDonorToMap = function (donor) {
+        this.addPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
     };
     MapComponent.prototype.addDonorToMap = function (donor) {
         this.appendPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
@@ -219,6 +226,10 @@ var MapComponent = (function () {
         __metadata('design:type', Object)
     ], MapComponent.prototype, "coordsReceived", void 0);
     __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], MapComponent.prototype, "mapModulesInitialised", void 0);
+    __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
     ], MapComponent.prototype, "parent_component", void 0);
@@ -229,7 +240,6 @@ var MapComponent = (function () {
             styles: [
                 "    \n        .map-holder {\n            padding: 0;\n            margin: 0;\n            height: 100%;\n            width: 100%;\n            float: left;\n        }\n    "
             ],
-            directives: [donor_component_1.DonorComponent],
             providers: [donor_service_1.DonorService]
         }), 
         __metadata('design:paramtypes', [donor_service_1.DonorService])

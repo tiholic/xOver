@@ -34,9 +34,9 @@ var DonorService = (function () {
             .map(this.extractData)
             .catch(this.handleError);
     };
-    DonorService.prototype.update = function (donor) {
-        var url = this.donorsUrl + "/" + donor._id;
-        return this.http.put(url, JSON.stringify(donor), { headers: this.headers })
+    DonorService.prototype.update = function (donor, donorPrivate) {
+        var url = this.donorsUrl + "/" + donor._id + "?donor_private=" + donorPrivate;
+        return this.http.patch(url, JSON.stringify(donor), { headers: this.headers })
             .map(this.extractData)
             .catch(this.handleError);
     };
@@ -55,7 +55,6 @@ var DonorService = (function () {
     };
     DonorService.prototype.extractData = function (res) {
         var body = res.json();
-        console.log(body.data);
         return body.data || body.status || {};
     };
     DonorService.prototype.handleError = function (error) {

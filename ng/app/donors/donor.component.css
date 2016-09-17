@@ -11,10 +11,30 @@ map-component{
 .donor-container{
     position: absolute;
     right: 0;
-    top: 7.5em;
+    top: 5em;
     background: white;
-    width: 25%;
-    border: 2px solid #a0a0a0;
+    width: 30%;
+    height: 100%;
+    padding: 10em 3em;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    font-size: 1.3em;
+}
+
+.infobox {
+    color: teal;
+    font-size: 0.7em;
+}
+
+.errorbox {
+    font-size: 0.7em;
+    color: #F44336;
+}
+
+.updated{
+    background-color: teal;
+    padding: 0.5em;
+    text-align: center;
+    color: white;
 }
 
 .donor-container table{
@@ -23,5 +43,35 @@ map-component{
 
 input {
     border: 0;
-    border-bottom: 1px solid teal;
+    border-bottom: 2px solid teal;
+    width:100%;
+    font-size: 1.3em;
+}
+
+button{
+    background: teal;   //#03A9F4;
+    padding: 1em;
+    color: white;
+    font-family: inherit;
+    font-weight: 600;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.del{
+    background-color: #F44336;
+}
+
+div.dm-container {
+    width: 100%;
+    height:100%;
+}
+
+div.success{
+    width: 100%;
+    height:100%;
+    text-align: center;
+    margin-top: 15em;
+    line-height: 1.5em;
 }

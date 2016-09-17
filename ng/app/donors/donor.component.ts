@@ -4,15 +4,13 @@
 
 
 import {Component, Output, EventEmitter, OnInit} from "@angular/core";
-import {Donor, RawDonor, PrivateDonor} from "../objects";
+import {RawDonor, PrivateDonor} from "../objects";
 import {DonorService} from "./donor.service";
 import {Router} from "@angular/router";
-import {MapComponent} from "../maps/map.component";
 @Component({
     selector: 'donor',
     templateUrl: 'ng/app/donors/donor.component.html',
     styleUrls: ['ng/app/donors/donor.component.css'],
-    directives:[MapComponent],
     providers: [DonorService]
 })
 export class DonorComponent implements OnInit{
@@ -23,12 +21,12 @@ export class DonorComponent implements OnInit{
     donor: PrivateDonor;
     rawDonor: RawDonor = {
         name:{
-            first: '',
-            last: ''
+            first: 'Rohit',
+            last: 'Reddy'
         },
-        contact_number: '',
-        email: '',
-        blood_group: '',
+        contact_number: '00917382393393',
+        email: 'rr.16566@gmail.com',
+        blood_group: 'B+',
         coordinates:{
             latitude: 100,
             longitude: 200
@@ -104,5 +102,22 @@ export class DonorComponent implements OnInit{
             latitude: 100,
             longitude: 200
         }
+    }
+
+    resetForm():void{
+        this.rawDonor = {
+            name:{
+                first: '',
+                last: ''
+            },
+            contact_number: '',
+            email: '',
+            blood_group: '',
+            coordinates:{
+                latitude: 100,
+                longitude: 200
+            }
+        };
+        this.success = false;
     }
 }

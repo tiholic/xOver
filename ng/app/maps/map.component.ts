@@ -4,9 +4,9 @@
 
 
 import {Component, OnInit, Output, EventEmitter, Input} from "@angular/core";
-import {DonorComponent} from "../donors/donor.component";
 import {DonorService} from "../donors/donor.service";
 import {Coords, Bounds, Donor} from "../objects";
+import {min} from "rxjs/operator/min";
 declare var requireModules: any;
 
 @Component({
@@ -23,7 +23,6 @@ declare var requireModules: any;
         }
     `
     ],
-    directives: [DonorComponent],
     providers: [DonorService]
 })
 export class MapComponent implements OnInit{
@@ -43,7 +42,9 @@ export class MapComponent implements OnInit{
     graphics:any = {};
     errorMessage:any;
     @Output() coordsReceived = new EventEmitter();
+    @Output() mapModulesInitialised = new EventEmitter();
     @Input() parent_component:string;
+    extentChangeCounter:number = 0;
 
     constructor(private donorService:DonorService){}
 
@@ -75,6 +76,7 @@ export class MapComponent implements OnInit{
             /*this.TaskLocator = TaskLocator;*/
             this.createMap(Map, MapView, Search);
             this.createSymbol();
+            this.mapModulesInitialised.emit();
         });
     }
 
@@ -91,7 +93,7 @@ export class MapComponent implements OnInit{
         });
         this.view.then(
             () => {
-                this.setViewExtent(null, null);
+                this.setScale(null);
                 var searchWidget = new Search({
                     view: this.view,
                 });
@@ -110,15 +112,26 @@ export class MapComponent implements OnInit{
 
     addEventsToMap():void{
         if(this.parent_component == "patient"){
-            this.view.watch("extent", (newValue, oldValue, property, object) => {
-                var maxBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
-                var minBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
-                var bounds:Bounds = {
-                    min: minBounds,
-                    max: maxBounds
-                };
-                this.loadDonors(bounds);
-            });
+            this.view.watch("extent",
+                (newValue, oldValue, property, object) => {
+                    var latestCounter = (++this.extentChangeCounter);
+                    var s = this;
+                    setTimeout(function(){
+                        if(latestCounter == s.extentChangeCounter){
+                            var maxBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
+                            var minBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
+                            var bounds:Bounds = {
+                                min: minBounds,
+                                max: maxBounds
+                            };
+                            console.log('\t\t',bounds.max.latitude);
+                            console.log(bounds.min.longitude,'\t\t',bounds.max.longitude);
+                            console.log('\t\t',bounds.min.latitude);
+                            s.loadDonors(bounds);
+                        }
+                    }, 500);
+                }
+            );
         }else{
             this.view.on("click",
                 evt => {
@@ -128,7 +141,7 @@ export class MapComponent implements OnInit{
                      unable to get address: issue from ESRI...
                      */
                     this.coordsReceived.emit(coords);
-                    this.addPoint(coords);
+                    this.addPoint(coords, null, null);
                     this.center(coords);
                 }
             );
@@ -139,13 +152,13 @@ export class MapComponent implements OnInit{
         // rounding off the decimals to 3 decimals
         if(coords instanceof Array){
             return {
-                latitude: Math.round(coords[1]*1000)/1000,
-                longitude: Math.round(coords[0]*1000)/1000,
+                latitude: coords[1],
+                longitude: coords[0],
             }
         }
         return {
-            latitude: Math.round(coords.latitude*1000)/1000,
-            longitude: Math.round(coords.longitude*1000)/1000,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
         }
     }
 
@@ -169,17 +182,13 @@ export class MapComponent implements OnInit{
         });
     }
 
-    createGraphic(geometry, attributes):any{
+    createGraphic(geometry, popupTemplate):any{
         var opts = {
             geometry: geometry,
             symbol: this.symbol
         };
-        if(attributes){
-            opts['attributes'] = attributes;
-            opts['popupTemplate'] = new this.PopupTemplate({
-                                        title: "{Name}",  // The title of the popup will be the name of the pipeline
-                                        content: "{*}"    // Displays a table of all the attributes in the popup
-                                    });
+        if(popupTemplate){
+            opts['popupTemplate'] = new this.PopupTemplate(popupTemplate);
         }
         return new this.Graphic(opts);
     }
@@ -189,12 +198,12 @@ export class MapComponent implements OnInit{
     }
 
     removeGraphic(graphic):void{
-        this.view.graphics.add(graphic);
+        this.view.graphics.remove(graphic);
     }
 
-    addPoint(coords):void{
+    addPoint(coords, popupDetails, id):void{
         this.clearAll();
-        this.appendPoint(coords, null, null);
+        this.appendPoint(coords, popupDetails, id);
     }
 
     appendPoint(coords, popupDetails, id):void{
@@ -207,17 +216,15 @@ export class MapComponent implements OnInit{
     }
 
     center(coords):void{
-        var newScale = (8*Math.pow(10,4));
-       this.setViewExtent({center: [coords.longitude, coords.latitude]}, (newScale < this.view.scale)?newScale:this.view.scale);
+        this.setScale((8*Math.pow(10,4)), false);
+        this.view.goTo([coords.longitude, coords.latitude]);
     }
 
-    setViewExtent(opts, scale):any{
-        if(!opts){
-            opts = {};
+    setScale(ratio:number, zoomout:boolean=true):void{
+        if(ratio && !zoomout){
+            ratio = (ratio<this.view.scale)?ratio:this.view.scale;
         }
-        opts.spatialReference = new this.SpatialReference({wkid:4326});
-        this.view.extent = new this.Extent(opts);
-        this.view.scale = scale?scale:(5*Math.pow(10,7));
+        this.view.scale = ratio?ratio:(5*Math.pow(10,7));
     }
 
     clearAll():void{
@@ -235,11 +242,20 @@ export class MapComponent implements OnInit{
 
     getTemplateForDonor(donor:Donor){
         return {
-            "Name": `${donor.name.first} ${donor.name.last}`,
-            "Blood Group": donor.blood_group.toUpperCase(),
-            "Contact Number": donor.contact_number,
-            "EMail": donor.email
-        }
+            "title": `${donor.name.first} ${donor.name.last}`,
+            "content": `
+                    <table>
+                        <tr><td>Name</td><td>${donor.name.first} ${donor.name.last}</td></tr>    
+                        <tr><td>Blood Group</td><td>${donor.blood_group.toUpperCase()}</td></tr>    
+                        <tr><td>Contact Number</td><td><a href="javascript:void(0)" onclick="this.parentElement.innerHTML='${donor.contact_number}'">(Click To Show)</a></td></tr>    
+                        <tr><td>Email</td><td><a href="javascript:void(0)" onclick="this.parentElement.innerHTML='${donor.email}'">(Click To Show)</a></td></tr>    
+                    </table>
+                `
+            }
+    }
+
+    addOnlyDonorToMap(donor:Donor):any{
+        this.addPoint(donor.coordinates, this.getTemplateForDonor(donor), donor._id);
     }
 
     addDonorToMap(donor:Donor):any{
@@ -261,7 +277,7 @@ export class MapComponent implements OnInit{
             .subscribe(
                 donors => {
                     this.clearAll();
-                    for(var index:number in donors){
+                    for(var index in donors){
                         this.addDonorToMap(donors[index]);
                     }
                 },

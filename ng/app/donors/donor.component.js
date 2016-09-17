@@ -14,7 +14,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 var donor_service_1 = require("./donor.service");
 var router_1 = require("@angular/router");
-var map_component_1 = require("../maps/map.component");
 var DonorComponent = (function () {
     function DonorComponent(donorService, router) {
         this.donorService = donorService;
@@ -23,12 +22,12 @@ var DonorComponent = (function () {
         this.component_name = "donor";
         this.rawDonor = {
             name: {
-                first: '',
-                last: ''
+                first: 'Rohit',
+                last: 'Reddy'
             },
-            contact_number: '',
-            email: '',
-            blood_group: '',
+            contact_number: '00917382393393',
+            email: 'rr.16566@gmail.com',
+            blood_group: 'B+',
             coordinates: {
                 latitude: 100,
                 longitude: 200
@@ -92,6 +91,22 @@ var DonorComponent = (function () {
             longitude: 200
         };
     };
+    DonorComponent.prototype.resetForm = function () {
+        this.rawDonor = {
+            name: {
+                first: '',
+                last: ''
+            },
+            contact_number: '',
+            email: '',
+            blood_group: '',
+            coordinates: {
+                latitude: 100,
+                longitude: 200
+            }
+        };
+        this.success = false;
+    };
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
@@ -101,7 +116,6 @@ var DonorComponent = (function () {
             selector: 'donor',
             templateUrl: 'ng/app/donors/donor.component.html',
             styleUrls: ['ng/app/donors/donor.component.css'],
-            directives: [map_component_1.MapComponent],
             providers: [donor_service_1.DonorService]
         }), 
         __metadata('design:paramtypes', [donor_service_1.DonorService, router_1.Router])

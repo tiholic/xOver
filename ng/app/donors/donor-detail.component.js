@@ -34,27 +34,82 @@ var DonorDetailComponent = (function () {
             }
         };
         this.errors = [];
+        this.mapInitialised = false;
+        this.deleted = false;
+        this.updated = false;
+        this.host = window.location.host;
     }
-    DonorDetailComponent.prototype.ngOnInit = function () {
+    DonorDetailComponent.prototype.ngAfterViewInit = function () {
         var _this = this;
         var params = window.location.search.substring(1).split('&');
-        var pmap = {
-            donor_id: null,
-            donor_private: null
-        };
-        for (var i in params) {
-            var kv = params[i].split('=');
-            pmap[kv[0]] = kv[1];
-        }
-        this.donorService.getDonor(pmap.donor_id).subscribe(function (donor) { return _this.donor = donor; }, function (err) { return console.log(err); });
+        var donor_id = params[0].split('=')[1];
+        this.donorPrivate = params[1].split('=')[1];
+        this.donorService.getDonor(donor_id).subscribe(function (donor) {
+            _this.donor = donor;
+            if (_this.mapInitialised) {
+                _this.pointDonor();
+            }
+        }, function (err) { return console.log(err); });
     };
+    DonorDetailComponent.prototype.pointDonor = function () {
+        this.mapInitialised = true;
+        this.mapComponent.addDonorToMap(this.donor);
+    };
+    DonorDetailComponent.prototype.updateDonor = function () {
+        var _this = this;
+        if (this.validate()) {
+            this.donorService.update(this.donor, this.donorPrivate).subscribe(function (donor) {
+                _this.updated = true;
+                var s = _this;
+                setTimeout(function () {
+                    s.updated = false;
+                }, 5000);
+            }, function (err) { return console.log(err); });
+        }
+    };
+    DonorDetailComponent.prototype.deleteDonor = function () {
+        var _this = this;
+        this.donorService.del(this.donor._id).subscribe(function (status) {
+            if (status.success) {
+                _this.deleted = true;
+            }
+        }, function (err) { return console.log(err); });
+    };
+    DonorDetailComponent.prototype.setCoords = function (coordinates) {
+        this.donor.coordinates = coordinates;
+    };
+    DonorDetailComponent.prototype.validate = function () {
+        this.errors = [];
+        var rawDonor = this.donor;
+        var err = false;
+        if (!rawDonor.name.first || (rawDonor.name.first != undefined && rawDonor.name.first.trim() == "")) {
+            this.errors.push('name.first');
+            err = true;
+        }
+        if (!(/^(00|\+)[0-9]{12}$/.test(rawDonor.contact_number))) {
+            this.errors.push('contact_number');
+            err = true;
+        }
+        if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(rawDonor.email))) {
+            this.errors.push('email');
+            err = true;
+        }
+        if (!(/^(a|b|o|ab)(\+|\-)$/.test(rawDonor.blood_group.toLowerCase()))) {
+            this.errors.push('blood_group');
+            err = true;
+        }
+        return !(err);
+    };
+    __decorate([
+        core_1.ViewChild('map'), 
+        __metadata('design:type', map_component_1.MapComponent)
+    ], DonorDetailComponent.prototype, "mapComponent", void 0);
     DonorDetailComponent = __decorate([
         core_1.Component({
             selector: 'donor-detail',
             templateUrl: 'ng/app/donors/donor-detail.component.html',
             styleUrls: ['ng/app/donors/donor.component.css'],
-            providers: [donor_service_1.DonorService],
-            directives: [map_component_1.MapComponent]
+            providers: [donor_service_1.DonorService]
         }), 
         __metadata('design:paramtypes', [donor_service_1.DonorService, router_1.Router])
     ], DonorDetailComponent);

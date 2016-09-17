@@ -16,6 +16,6 @@ var donorSchema = new mongoose.Schema({
         longitude: {type: Number, required: true}
     },
     private_id: {type:String}
-},{strict: true});
+});
 var Donor = mongoose.model('Donors', donorSchema);
 module.exports = Donor;

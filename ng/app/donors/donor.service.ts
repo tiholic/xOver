@@ -31,9 +31,9 @@ export class DonorService {
                 .catch(this.handleError);
     }
 
-    update(donor:Donor):Observable<Donor>{
-        const url = `${this.donorsUrl}/${donor._id}`;
-        return this.http.put(url, JSON.stringify(donor), {headers: this.headers})
+    update(donor:Donor, donorPrivate:string):Observable<Donor>{
+        const url = `${this.donorsUrl}/${donor._id}?donor_private=${donorPrivate}`;
+        return this.http.patch(url, JSON.stringify(donor), {headers: this.headers})
             .map(this.extractData)
             .catch(this.handleError)
     }
@@ -55,7 +55,6 @@ export class DonorService {
 
     private extractData(res: Response){
         let body = res.json();
-        console.log(body.data);
         return body.data || body.status || {};
     }
 

@@ -35,6 +35,9 @@ nav a {
     margin-left: -0.3em;
     display: inline-block;
 }
+nav a:visited {
+    color: white
+}
 nav a:hover {
     color: teal;
     background-color: white;

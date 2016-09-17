@@ -14,7 +14,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "start": "concurrent \"./node_modules/.bin/nodemon --debug server.js\" \"npm run tsc:w\"",
+    "start": "concurrently \"./node_modules/.bin/nodemon --debug server.js\" \"npm run tsc:w\"",
     "start:prod": "node server.js"
   },
   "dependencies": {
@@ -72,6 +72,7 @@
     "zone.js": "^0.6.17"
   },
   "devDependencies": {
+    "@types/core-js": "^0.9.32",
     "concurrently": "^2.2.0",
     "es6-promise-loader": "^1.0.1",
     "es7-reflect-metadata": "^1.6.0",

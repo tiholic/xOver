@@ -34,7 +34,7 @@ var PatientComponent = (function () {
         var _this = this;
         this.socket.on("donors-add", function (donor) { return _this.mapComponent.addDonorToMap(donor); });
         this.socket.on("donors-update", function (donor) { return _this.mapComponent.updateDonorOnMap(donor); });
-        this.socket.on("donors-delete", function (donor) { console.log('donor deleted'); _this.mapComponent.removeDonorFromMap(donor); });
+        this.socket.on("donors-delete", function (donor) { return _this.mapComponent.removeDonorFromMap(donor); });
     };
     __decorate([
         core_1.Output(), 
@@ -48,7 +48,6 @@ var PatientComponent = (function () {
         core_1.Component({
             selector: 'patient',
             template: '<map-component [parent_component]="component_name" #map></map-component>',
-            directives: [map_component_1.MapComponent],
             providers: [donor_service_1.DonorService]
         }), 
         __metadata('design:paramtypes', [])

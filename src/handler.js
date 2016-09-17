@@ -118,32 +118,32 @@ function handler(options) {
         if(transform!=false) {
             data = transformData(data, operation);
         }
-        if(options.ccb){
-            options.ccb(operation, data);
+        if(options.handler.ccb){
+            options.handler.ccb(operation, data);
         }
         return data;
     }
 
     function preSave(){
         var data = request.body;
-        if(options.preSave){
-            return options.preSave(request, data, operation);
+        if(options.handler.preSave){
+            return options.handler.preSave(request, data, operation);
         }else{
             return data;
         }
     }
 
     function transformData(data){
-        if(options.transformData){
-            return options.transformData(request, data, operation);
+        if(options.handler.transformData){
+            return options.handler.transformData(request, data, operation);
         }else{
             return data;
         }
     }
 
     function getQuery(){
-        if(options.queryHandler){
-            return options.queryHandler(request, operation);
+        if(options.handler.queryHandler){
+            return options.handler.queryHandler(request, operation);
         }
         if(operation=='get'){
             return {_id:req.params.id};
