@@ -88,13 +88,7 @@ var MapComponent = (function () {
                 var s = _this;
                 setTimeout(function () {
                     if (latestCounter == s.extentChangeCounter) {
-                        var maxBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
-                        var minBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
-                        var bounds = {
-                            min: minBounds,
-                            max: maxBounds
-                        };
-                        s.loadDonors(bounds);
+                        s.loadDonors(s.getBounds(object.extent));
                     }
                 }, 500);
             });
@@ -189,7 +183,12 @@ var MapComponent = (function () {
         var _this = this;
         navigator.geolocation.getCurrentPosition(function (GeoPosition) {
             _this.center(GeoPosition.coords);
-        }, function (err) { return console.log(err.message); });
+        }, function (err) {
+            console.log(err.message);
+            if (_this.parent_component == "patient") {
+                _this.loadDonors(_this.getBounds());
+            }
+        });
     };
     MapComponent.prototype.getTemplateForDonor = function (donor) {
         return {
@@ -222,6 +221,16 @@ var MapComponent = (function () {
                 this.view.popup.content = this.getPopupContent(donor);
             }
         }
+    };
+    MapComponent.prototype.getBounds = function (obj) {
+        if (obj === void 0) { obj = this.view.extent; }
+        var maxBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(obj.xmax, obj.ymax));
+        var minBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(obj.xmin, obj.ymin));
+        var bounds = {
+            min: minBounds,
+            max: maxBounds
+        };
+        return bounds;
     };
     MapComponent.prototype.loadDonors = function (bounds) {
         var _this = this;

@@ -120,13 +120,7 @@ export class MapComponent implements OnInit{
                     var s = this;
                     setTimeout(function(){
                         if(latestCounter == s.extentChangeCounter){
-                            var maxBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmax, object.extent.ymax));
-                            var minBounds = s.getCoords(s.WebMercatorUtils.xyToLngLat(object.extent.xmin, object.extent.ymin));
-                            var bounds:Bounds = {
-                                min: minBounds,
-                                max: maxBounds
-                            };
-                            s.loadDonors(bounds);
+                            s.loadDonors(s.getBounds(object.extent));
                         }
                     }, 500);
                 }
@@ -235,7 +229,12 @@ export class MapComponent implements OnInit{
             GeoPosition => {
                 this.center(GeoPosition.coords);
             },
-            err => console.log(err.message)
+            err => {
+                console.log(err.message);
+                if(this.parent_component=="patient") {
+                    this.loadDonors(this.getBounds());
+                }
+            }
         );
     }
 
@@ -290,6 +289,16 @@ export class MapComponent implements OnInit{
         }
     }
 
+    getBounds(obj=this.view.extent){
+        var maxBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(obj.xmax, obj.ymax));
+        var minBounds = this.getCoords(this.WebMercatorUtils.xyToLngLat(obj.xmin, obj.ymin));
+        var bounds:Bounds = {
+            min: minBounds,
+            max: maxBounds
+        };
+        return bounds;
+    }
+
     loadDonors(bounds:Bounds):void{
         this.donorService.getDonors(bounds)
             .subscribe(
@@ -303,3 +312,4 @@ export class MapComponent implements OnInit{
             )
     }
 }
+

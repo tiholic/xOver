@@ -14,8 +14,8 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "start:dev": "concurrently \"./node_modules/.bin/nodemon --debug server.js\" \"npm run tsc:w\"",
-    "start": "node server.js",
+    "start": "concurrently \"./node_modules/.bin/nodemon --debug server.js\" \"npm run tsc:w\"",
+    "start:prod": "node server.js",
     "test": "./node_modules/mocha/bin/mocha ./tests"
   },
   "dependencies": {
